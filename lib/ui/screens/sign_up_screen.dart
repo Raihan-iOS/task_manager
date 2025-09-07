@@ -3,16 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/Sign_up_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
-class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<SignInScreen> createState() => _SignInScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignInScreenState extends State<SignInScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _mobileNoController = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -27,7 +31,7 @@ class _SignInScreenState extends State<SignInScreen> {
               children: [
                 SizedBox(height: 82),
                 Text(
-                  "Get Started With",
+                  "Join With Us",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 SizedBox(height: 24),
@@ -35,6 +39,21 @@ class _SignInScreenState extends State<SignInScreen> {
                 TextFormField(
                   decoration: InputDecoration(hintText: "Email"),
                   controller: _emailController,
+                ),
+                SizedBox(height: 8),
+                TextFormField(
+                  decoration: InputDecoration(hintText: "First Name"),
+                  controller: _firstNameController,
+                ),
+                SizedBox(height: 8),
+                TextFormField(
+                  decoration: InputDecoration(hintText: "Last Name"),
+                  controller: _lastNameController,
+                ),
+                SizedBox(height: 8),
+                TextFormField(
+                  decoration: InputDecoration(hintText: "Mobile No"),
+                  controller: _mobileNoController,
                 ),
                 SizedBox(height: 8),
                 TextFormField(
@@ -51,29 +70,20 @@ class _SignInScreenState extends State<SignInScreen> {
                 Center(
                   child: Column(
                     children: [
-                      TextButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Forgot Password?",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
                       RichText(
                         text: TextSpan(
                           style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w600,
                           ),
-                          text: "Don't have an account? ",
+                          text: "Already have an account? ",
                           children: [
                             TextSpan(
-                              text: "Sign Up",
+                              text: "Sign in",
                               style: TextStyle(color: Colors.green),
                               recognizer:
                                   TapGestureRecognizer()
-                                    ..onTap = () {
-                                      _gotoSignUpScreen();
-                                    },
+                                    ..onTap = _gotoSignInScreen,
                             ),
                           ],
                         ),
@@ -89,11 +99,8 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  void _gotoSignUpScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SignUpScreen()),
-    );
+  void _gotoSignInScreen() {
+    Navigator.pop(context);
   }
 
   @override
@@ -101,6 +108,9 @@ class _SignInScreenState extends State<SignInScreen> {
     // TODO: implement dispose
     _emailController.dispose();
     _passwordController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _mobileNoController.dispose();
     super.dispose();
   }
 }
