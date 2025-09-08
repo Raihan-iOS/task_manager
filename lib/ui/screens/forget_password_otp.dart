@@ -1,0 +1,129 @@
+        import 'package:flutter/gestures.dart';
+        import 'package:flutter/material.dart';
+        import 'package:pin_code_fields/pin_code_fields.dart';
+        import 'package:task_manager/ui/screens/Sign_in_screen.dart';
+import 'package:task_manager/ui/screens/forget_password_setpassword.dart';
+        import 'package:task_manager/ui/widgets/screen_background.dart';
+
+        class ForgetPasswordOtp extends StatelessWidget {
+          ForgetPasswordOtp({super.key});
+
+          final TextEditingController _pinController = TextEditingController();
+          final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+          @override
+          Widget build(BuildContext context) {
+            return Scaffold(
+              body: ScreenBackground(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 82),
+                        Text(
+                          "PIN Verification",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "A 6 digit verification has been  sent to your email address",
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                        ),
+                        const SizedBox(height: 24),
+                      PinCodeTextField(
+                        keyboardType: TextInputType.number,
+                          length: 6,
+                          obscureText: false,
+                          animationType: AnimationType.fade,
+                          pinTheme: PinTheme(
+                                              shape: PinCodeFieldShape.box,
+                            borderRadius: BorderRadius.circular(5),
+                                              fieldHeight: 50,
+                            fieldWidth: 40,
+                            activeFillColor: Colors.white,
+                            selectedFillColor: Colors.white,
+                            inactiveFillColor: Colors.white,
+                            errorBorderColor: Colors.transparent,
+                            activeColor: Colors.grey,        // border when field has value
+                            selectedColor: Colors.green,     // border when selected (focused)
+                            inactiveColor: Colors.white,      // border when inactive
+                            // border when error
+                            borderWidth: 1,                  // visible border
+                           
+                          ),
+                          animationDuration: Duration(milliseconds: 300),
+                          backgroundColor: Colors.transparent,
+                          enableActiveFill: true,
+                        
+                          
+                          controller: _pinController,
+                          onCompleted: (v) {
+                            print("Completed");
+                          },
+                          onChanged: (value) {
+                            print(value);
+            
+                            },
+                            beforeTextPaste: (text) {
+                                                print("Allowing to paste $text");
+                              //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                              //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                              return true;
+                            }, appContext: context,
+                          ),
+                        const SizedBox(height: 24),
+                        FilledButton(
+                          onPressed: () {
+                            _gotoSetPasswordScreen(context);
+                          },
+                          child: const Text("Verify"),
+                        ),
+                        const SizedBox(height: 36),
+                        Center(
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              text: "Already have an account? ",
+                              children: [
+                                TextSpan(
+                                  text: "Sign In",
+                                  style: const TextStyle(color: Colors.green),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      _gotoSignInScreen(context);
+                                    },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }
+
+          void _gotoSignInScreen(BuildContext context) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => SignInScreen()),
+              (route) => false,
+            );
+          }
+
+ void _gotoSetPasswordScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ForgetPasswordSetPassword()), 
+    );
+  }
+    
+
+        }

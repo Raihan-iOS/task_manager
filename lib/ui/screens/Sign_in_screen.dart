@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/Sign_up_screen.dart';
+import 'package:task_manager/ui/screens/forget_password_email_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -52,7 +53,9 @@ class _SignInScreenState extends State<SignInScreen> {
                   child: Column(
                     children: [
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _gotoEmailPasswordScreen();
+                        },
                         child: Text(
                           "Forgot Password?",
                           style: TextStyle(color: Colors.grey),
@@ -95,6 +98,14 @@ class _SignInScreenState extends State<SignInScreen> {
       MaterialPageRoute(builder: (context) => const SignUpScreen()),
     );
   }
+
+   void _gotoEmailPasswordScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) =>  ForgetPasswordEmail()),
+    );
+  }
+
 
   @override
   void dispose() {
