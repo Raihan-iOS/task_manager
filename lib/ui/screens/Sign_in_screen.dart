@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/Sign_up_screen.dart';
 import 'package:task_manager/ui/screens/forget_password_email_screen.dart';
+import 'package:task_manager/ui/screens/home/main_nav_holder_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -45,7 +46,11 @@ class _SignInScreenState extends State<SignInScreen> {
                 ),
                 SizedBox(height: 24),
                 FilledButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    // if (_formKey.currentState!.validate()) {
+                    _gotoHomepScreen();
+                    // }
+                  },
                   child: Icon(Icons.arrow_circle_right),
                 ),
                 SizedBox(height: 36),
@@ -99,13 +104,20 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-   void _gotoEmailPasswordScreen() {
+  void _gotoEmailPasswordScreen() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) =>  ForgetPasswordEmail()),
+      MaterialPageRoute(builder: (context) => ForgetPasswordEmail()),
     );
   }
 
+  void _gotoHomepScreen() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const MainNavHolderScreen()),
+      (predicate) => false,
+    );
+  }
 
   @override
   void dispose() {
