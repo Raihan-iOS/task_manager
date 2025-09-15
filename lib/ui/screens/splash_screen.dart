@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:task_manager/ui/screens/sign_in_screen.dart';
-import 'package:task_manager/ui/screens/sign_up_screen.dart';
+import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 import 'package:task_manager/ui/utils/assets_path.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 

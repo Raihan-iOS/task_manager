@@ -1,14 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:task_manager/ui/screens/Sign_in_screen.dart';
-import 'package:task_manager/ui/screens/forget_password_otp.dart';
+import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
+import 'package:task_manager/ui/screens/auth/forget_password_otp.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
-class ForgetPasswordSetPassword extends StatelessWidget {
-  ForgetPasswordSetPassword({super.key});
+class ForgetPasswordEmail extends StatelessWidget {
+  ForgetPasswordEmail({super.key});
 
-  final TextEditingController _paswordController = TextEditingController();
-  final TextEditingController _confirmPaswordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -24,30 +23,27 @@ class ForgetPasswordSetPassword extends StatelessWidget {
               children: [
                 const SizedBox(height: 82),
                 Text(
-                  "Set Password",
+                  "Your Email Address",
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  "Password must be at least 8 characters and include 1 letter, 1 number & 1 special character",
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  "A 6 digit verification code will be sent to your email address",
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
                 ),
                 const SizedBox(height: 24),
                 TextFormField(
-                  decoration: const InputDecoration(hintText: "Password"),
-                  controller: _paswordController,
-                ),
-                 const SizedBox(height: 8),
-                TextFormField(
-                  decoration: const InputDecoration(hintText: "Confirm Password"),
-                  controller: _paswordController,
+                  decoration: const InputDecoration(hintText: "Email"),
+                  controller: _emailController,
                 ),
                 const SizedBox(height: 24),
                 FilledButton(
-                  onPressed: (){
-                    _gotoSignInScreen(context);
+                  onPressed: () {
+                    _gotoPinScreen(context);
                   },
-                  child: Icon(Icons.arrow_circle_right),
+                  child: const Icon(Icons.arrow_circle_right),
                 ),
                 const SizedBox(height: 36),
                 Center(
@@ -62,10 +58,11 @@ class ForgetPasswordSetPassword extends StatelessWidget {
                         TextSpan(
                           text: "Sign In",
                           style: const TextStyle(color: Colors.green),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () {
-                              _gotoSignInScreen(context);
-                            },
+                          recognizer:
+                              TapGestureRecognizer()
+                                ..onTap = () {
+                                  _gotoSignInScreen(context);
+                                },
                         ),
                       ],
                     ),
@@ -86,4 +83,10 @@ class ForgetPasswordSetPassword extends StatelessWidget {
     );
   }
 
+  void _gotoPinScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => ForgetPasswordOtp()),
+    );
+  }
 }

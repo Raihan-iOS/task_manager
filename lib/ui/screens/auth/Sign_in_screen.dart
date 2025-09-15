@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/Sign_up_screen.dart';
-import 'package:task_manager/ui/screens/forget_password_email_screen.dart';
+import 'package:task_manager/ui/screens/auth/forget_password_email_screen.dart';
 import 'package:task_manager/ui/screens/home/main_nav_holder_screen.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 

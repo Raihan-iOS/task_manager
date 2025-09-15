@@ -3,6 +3,7 @@ import 'package:task_manager/ui/screens/home/canceled_task_screen.dart';
 import 'package:task_manager/ui/screens/home/completed_task_screen.dart';
 import 'package:task_manager/ui/screens/home/new_task_screen.dart';
 import 'package:task_manager/ui/screens/home/progress_task_screen.dart';
+import 'package:task_manager/ui/widgets/app_bar.dart';
 
 class MainNavHolderScreen extends StatefulWidget {
   const MainNavHolderScreen({super.key});
@@ -52,50 +53,4 @@ class _MainNavHolderScreenState extends State<MainNavHolderScreen> {
       body: Center(child: _screens[_selectedIndex]),
     );
   }
-}
-
-class TmAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const TmAppbar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.green,
-      title: Row(
-        children: [
-          CircleAvatar(),
-          SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "User Name",
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: Colors.white),
-              ),
-
-              Text(
-                "Email",
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: Colors.white),
-              ),
-            ],
-          ),
-        ],
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.logout_outlined, color: Colors.white),
-
-          onPressed: () {},
-        ),
-      ],
-    );
-  }
-
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }

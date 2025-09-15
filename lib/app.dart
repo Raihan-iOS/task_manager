@@ -9,6 +9,7 @@ class TaskMangerApp extends StatelessWidget {
     return MaterialApp(
       home: SplashScreen(),
       theme: ThemeData(
+        appBarTheme: AppBarTheme(iconTheme: IconThemeData(color: Colors.white)),
         textTheme: TextTheme(
           titleLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
         ),
