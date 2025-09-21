@@ -6,6 +6,7 @@ import 'package:task_manager/ui/widgets/screen_background.dart';
 
 class ForgetPasswordEmail extends StatelessWidget {
   ForgetPasswordEmail({super.key});
+  static const String routeName = '/forget-password';
 
   final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -77,16 +78,14 @@ class ForgetPasswordEmail extends StatelessWidget {
   }
 
   void _gotoSignInScreen(BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => SignInScreen()),
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      SignInScreen.routeName,
       (route) => false,
     );
   }
 
   void _gotoPinScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ForgetPasswordOtp()),
-    );
+    Navigator.pushNamed(context, ForgetPasswordOtp.routeName);
   }
 }

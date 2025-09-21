@@ -4,6 +4,7 @@ import 'package:task_manager/ui/widgets/screen_background.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
   const AddNewTaskScreen({super.key});
+  static const String routeName = '/add-new-task';
 
   @override
   State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();

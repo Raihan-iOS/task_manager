@@ -5,6 +5,7 @@ import 'package:task_manager/ui/widgets/task_count_by_status_card.dart';
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({super.key});
+  static const String routeName = '/new-tasks';
 
   @override
   State<NewTaskScreen> createState() => _NewTaskScreenState();
@@ -50,10 +51,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   void gotoAddNewtaskScreen() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const AddNewTaskScreen()),
-    );
+    Navigator.pushNamed(context, AddNewTaskScreen.routeName);
   }
 }
 

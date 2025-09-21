@@ -9,6 +9,7 @@ import 'package:task_manager/ui/widgets/screen_background.dart';
 
 class ForgetPasswordOtp extends StatelessWidget {
   ForgetPasswordOtp({super.key});
+  static const String routeName = '/forget-password-otp';
 
   final TextEditingController _pinController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -116,16 +117,14 @@ class ForgetPasswordOtp extends StatelessWidget {
   }
 
   void _gotoSignInScreen(BuildContext context) {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => SignInScreen()),
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      SignInScreen.routeName,
       (route) => false,
     );
   }
 
   void _gotoSetPasswordScreen(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ForgetPasswordSetPassword()),
-    );
+    Navigator.pushNamed(context, ForgetPasswordSetPassword.routeName);
   }
 }
