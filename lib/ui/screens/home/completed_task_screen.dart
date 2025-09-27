@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/home/new_task_screen.dart';
 import 'package:task_manager/ui/widgets/task_card.dart';
-import 'package:task_manager/ui/widgets/task_count_by_status_card.dart';
 
 class CompletedTaskScreen extends StatefulWidget {
   const CompletedTaskScreen({super.key});
