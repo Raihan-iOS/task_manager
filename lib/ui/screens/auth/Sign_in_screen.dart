@@ -164,7 +164,6 @@ class _SignInScreenState extends State<SignInScreen> {
       String accessToken  = response.responseData['token'];
       await AuthController.saveUserData(userModel, accessToken);
 
-
       debugPrint('User from AuthController: ${AuthController.userModel}');
       debugPrint('Token from AuthController: ${AuthController.accessToken}');
 
