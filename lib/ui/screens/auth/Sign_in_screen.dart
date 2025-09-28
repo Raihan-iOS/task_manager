@@ -1,8 +1,10 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/user_model.dart';
 import 'package:task_manager/data/services/api_caller.dart';
 import 'package:task_manager/data/utils/constant.dart';
+import 'package:task_manager/ui/screens/Controller/auth_controller.dart';
 import 'package:task_manager/ui/screens/auth/forget_password_email_screen.dart';
 import 'package:task_manager/ui/screens/auth/sign_up_screen.dart';
 import 'package:task_manager/ui/screens/home/main_nav_holder_screen.dart';
@@ -24,6 +26,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _signInInProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -142,6 +145,7 @@ class _SignInScreenState extends State<SignInScreen> {
   void _gotoHomepScreen() {
     if (_formKey.currentState!.validate()) {
      //! Navigate to home screen
+      debugPrint("Sign In Pressed after validation");
       _signIn();
     }
   }
@@ -156,6 +160,16 @@ class _SignInScreenState extends State<SignInScreen> {
     ApiResponse response =
         await ApiCaller.postRequest(url: Urls.login, body: requestBody);
     if (response.isSuccess == true && response.responseData['status'] == 'success') {
+      UserModel userModel = UserModel.fromJson(response.responseData['data']);
+      String accessToken  = response.responseData['token'];
+      await AuthController.saveUserData(userModel, accessToken);
+
+
+      debugPrint('User from AuthController: ${AuthController.userModel}');
+      debugPrint('Token from AuthController: ${AuthController.accessToken}');
+
+
+
       _clearForm();
       _signInInProgress = false;
       setState(() {});
