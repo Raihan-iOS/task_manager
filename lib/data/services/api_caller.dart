@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
 
+import '../../ui/screens/Controller/auth_controller.dart';
+
 // class ApiCaller {
 //   static Logger logger = Logger();
 
@@ -211,6 +213,7 @@ class ApiCaller {
   /// Default headers (you can extend with auth tokens, etc.)
   static Map<String, String> defaultHeaders = {
     "Content-Type": "application/json",
+    "token" : AuthController.accessToken ?? '',
   };
 
   static int timeoutDuration = 30;
@@ -221,6 +224,7 @@ class ApiCaller {
       Uri uri = Uri.parse(url);
       _logRequest(url: url);
       Response response = await get(
+        headers: defaultHeaders,
         uri,
       ).timeout(Duration(seconds: timeoutDuration));
 

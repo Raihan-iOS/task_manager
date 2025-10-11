@@ -2,9 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 import 'package:task_manager/ui/screens/profile/profile_screen.dart';
 
-class TmAppbar extends StatelessWidget implements PreferredSizeWidget {
+import '../screens/Controller/auth_controller.dart';
+
+class TmAppbar extends StatefulWidget implements PreferredSizeWidget {
   const TmAppbar({super.key});
 
+  @override
+  State<TmAppbar> createState() => _TmAppbarState();
+
+  @override
+  // TODO: implement preferredSize
+  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+}
+
+class _TmAppbarState extends State<TmAppbar> {
   @override
   Widget build(BuildContext context) {
     return AppBar(
@@ -24,14 +35,14 @@ class TmAppbar extends StatelessWidget implements PreferredSizeWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "User Name",
+                  AuthController.userModel?.fullName ?? 'N/A',
                   style: Theme.of(
                     context,
                   ).textTheme.titleMedium?.copyWith(color: Colors.white),
                 ),
 
                 Text(
-                  "Email",
+                  AuthController.userModel?.email ?? 'N/A',
                   style: Theme.of(
                     context,
                   ).textTheme.bodySmall?.copyWith(color: Colors.white),
@@ -46,18 +57,21 @@ class TmAppbar extends StatelessWidget implements PreferredSizeWidget {
           icon: Icon(Icons.logout_outlined, color: Colors.white),
 
           onPressed: () {
-            Navigator.pushNamedAndRemoveUntil(
-              context,
-              SignInScreen.routeName,
-              (route) => false,
-            );
+            _logout();
           },
         ),
       ],
     );
   }
 
-  @override
-  // TODO: implement preferredSize
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+Future <void> _logout() async {
+  await AuthController.clearUserData();
+  Navigator.pushNamedAndRemoveUntil(
+    context,
+    SignInScreen.routeName,
+        (predicate) => false,
+  );
+  }
+
+
 }

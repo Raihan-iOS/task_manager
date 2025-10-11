@@ -5,7 +5,7 @@ class UserModel {
   final String lastName;
   final String mobile;
 
-
+String get fullName => '$firstName $lastName';
   UserModel(
       {required this.id, required this.email, required this.firstName, required this.lastName, required this.mobile});
 

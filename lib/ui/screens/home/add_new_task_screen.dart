@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/services/api_caller.dart';
+import 'package:task_manager/ui/widgets/SnackBarMessage.dart';
 import 'package:task_manager/ui/widgets/app_bar.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
+
+import '../../../data/utils/constant.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
   const AddNewTaskScreen({super.key});
@@ -15,6 +19,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
   final TextEditingController _titleTEController = TextEditingController();
   final TextEditingController _descriptionTEController =
       TextEditingController();
+  bool _addNewTaskInProgress = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +31,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -38,15 +44,33 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                     controller: _titleTEController,
                     decoration: InputDecoration(hintText: "Title"),
                     textInputAction: TextInputAction.next,
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Please enter title';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 8),
                   TextFormField(
                     controller: _descriptionTEController,
                     maxLines: 7,
                     decoration: InputDecoration(hintText: "Description"),
+                    validator: (String? value) {
+                      if (value?.trim().isEmpty ?? true) {
+                        return 'Please enter description';
+                      }
+                      return null;
+                    },
                   ),
                   SizedBox(height: 16),
-                  FilledButton(onPressed: () {}, child: Text('Add')),
+                  Visibility(
+                    visible: _addNewTaskInProgress == false,
+                    replacement: CircularProgressIndicator(),
+                    child: FilledButton(onPressed: () {
+                      _addNewTask();
+                    }, child: Text('Add')),
+                  ),
                 ],
               ),
             ),
@@ -54,6 +78,38 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         ),
       ),
     );
+  }
+  void _onTapAddNewTask() {
+    if (_formKey.currentState?.validate() ?? false) {
+      _addNewTask();
+    }
+  }
+
+  Future<void> _addNewTask() async {
+    _addNewTaskInProgress = true;
+    String title = _titleTEController.text.trim();
+    String description = _descriptionTEController.text.trim();
+    Map<String,dynamic> requestBody = {
+      "title":title,
+      "description": description,
+      "status":"New"
+    };
+    ApiResponse apiResponse = await ApiCaller.postRequest(url: Urls.createTask,body:requestBody);
+   if (apiResponse.isSuccess == true){
+     _clearFormData();
+     ShowSnackBarMessage(context, 'Task added successfully');
+     _addNewTaskInProgress = false;
+     setState(() {});
+
+   }else{
+     ShowSnackBarMessage(context, apiResponse?.errorMessage ?? 'Something went wrong');
+     _addNewTaskInProgress = false;
+     setState(() {});
+   }
+  }
+  void _clearFormData() {
+    _titleTEController.clear();
+    _descriptionTEController.clear();
   }
 
   @override
