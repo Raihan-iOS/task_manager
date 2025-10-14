@@ -17,6 +17,7 @@ class taskCard extends StatefulWidget {
 
 class _taskCardState extends State<taskCard> {
   bool _changeStatusInProgress = false;
+  bool _deleteStatusInProgress = false;
 
 
   Color TaskTypeColor(TaskStatus taskType) {
@@ -28,6 +29,23 @@ class _taskCardState extends State<taskCard> {
       return Colors.green;
     } else {
       return Colors.red;
+    }
+  }
+
+  Future<void> _deleteTask() async {
+    _deleteStatusInProgress = true;
+    setState(() {});
+    final ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.deleteTask(widget.taskModel.id));
+    if (apiResponse.isSuccess == true) {
+      _deleteStatusInProgress = false;
+      widget.refreashParents();
+
+      setState(() {});
+    }else{
+      _deleteStatusInProgress = false;
+
+      setState(() {});
+      ShowSnackBarMessage(context, apiResponse.errorMessage!);
     }
   }
 
@@ -82,23 +100,48 @@ class _taskCardState extends State<taskCard> {
               ),
               Spacer(),
               Visibility(
-                visible: _changeStatusInProgress == false,
+                visible: _deleteStatusInProgress == false,
                 replacement: Center(child: CircularProgressIndicator()),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _showDeleteTap();
+                  },
                   icon: Icon(Icons.delete, color: Colors.red),
                 ),
               ),
-              IconButton(
-                onPressed: () {
-                  _showChangeStatusDialog();
-                },
-                icon: Icon(Icons.edit, color: Colors.green),
+              Visibility(
+                visible: _changeStatusInProgress == false,
+                replacement: Center(child: CircularProgressIndicator()),
+                child: IconButton(
+                  onPressed: () {
+                    _showChangeStatusDialog();
+                  },
+                  icon: Icon(Icons.edit, color: Colors.green),
+                ),
               ),
             ],
           ),
         ],
       ),
+    );
+  }
+
+  void _showDeleteTap(){
+    showDialog(context: context, builder: (context)=>
+        AlertDialog(
+          title: Text('Delete Task'),
+          content: Text('Are you sure you want to delete this task?'),
+          actions: [
+            TextButton(onPressed: (){
+              Navigator.of(context).pop();
+            }, child: Text('No')),
+            TextButton(onPressed: ()async{
+              _deleteTask();
+              Navigator.of(context).pop();
+
+            }, child: Text('Yes')),
+          ],
+        )
     );
   }
 

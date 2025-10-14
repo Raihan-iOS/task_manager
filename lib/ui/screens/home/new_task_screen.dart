@@ -110,6 +110,7 @@ if (apiResponse.isSuccess == true) {
                   replacement: Center(child: CircularProgressIndicator()),
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
+
                     itemBuilder:
                         (context, index) =>
                             TaskCountByStatus(title: _taskStatusCountList[index].status, count:  _taskStatusCountList[index].count),

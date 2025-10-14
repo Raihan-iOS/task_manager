@@ -5,5 +5,9 @@ class Urls {
   static const String createTask = "${baseUrl}/createTask";
   static const String allTaskStatusCount = "${baseUrl}/taskStatusCount";
   static const String newTasks = "${baseUrl}/listTaskByStatus/New";
+  static const String cancelledTasks = "${baseUrl}/listTaskByStatus/Cancelled";
+  static const String completedTasks = "${baseUrl}/listTaskByStatus/Completed";
+  static const String progressTasks = "${baseUrl}/listTaskByStatus/Progress";
   static  String changeTaskStatus(String taskId,String status) => "${baseUrl}/updateTaskStatus/${taskId}/${status}";
+  static  String  deleteTask(String taskId) => "${baseUrl}/deleteTask/${taskId}";
 }
