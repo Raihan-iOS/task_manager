@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/ui/screens/home/new_task_screen.dart';
 
-class taskCard extends StatelessWidget {
-  const taskCard({super.key, required this.taskStatus});
+import '../../data/services/api_caller.dart';
+import '../../data/utils/constant.dart';
+import 'SnackBarMessage.dart';
+
+class taskCard extends StatefulWidget {
+  const taskCard({super.key, required this.taskStatus, required this.taskModel,required this.refreashParents});
   final TaskStatus taskStatus;
+  final TaskModel taskModel;
+ final VoidCallback refreashParents;
+  @override
+  State<taskCard> createState() => _taskCardState();
+}
+
+class _taskCardState extends State<taskCard> {
+  bool _changeStatusInProgress = false;
+
 
   Color TaskTypeColor(TaskStatus taskType) {
     if (taskType == TaskStatus.New) {
@@ -17,41 +31,68 @@ class taskCard extends StatelessWidget {
     }
   }
 
+  Future<void> _changeStatus(String status) async {
+    if(status == widget.taskModel.status){
+      return;
+    }
+    _changeStatusInProgress = true;
+    setState(() {});
+     final ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.changeTaskStatus(widget.taskModel.id, status));
+     if (apiResponse.isSuccess == true) {
+       _changeStatusInProgress = false;
+        widget.refreashParents();
+       Navigator.of(context).pop();
+       setState(() {});
+     }else{
+       _changeStatusInProgress = false;
+       Navigator.of(context).pop();
+       setState(() {});
+       ShowSnackBarMessage(context, apiResponse.errorMessage!);
+     }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListTile(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       tileColor: Colors.white,
-      title: Text('Task name will be given'),
+      title: Text(widget.taskModel.title),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Text('Description Project name will be given'),
+          Text(widget.taskModel.description),
           Text(
-            'Date 12/12/2021',
+            'Date: ${widget.taskModel.createdDate}',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
           ),
           Row(
             children: [
               Chip(
                 label: Text(
-                  taskStatus.name,
+                  widget.taskModel.status,
                   style: TextStyle(color: Colors.white),
                 ),
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                backgroundColor: TaskTypeColor(taskStatus),
+                backgroundColor: TaskTypeColor(widget.taskStatus),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
                 ),
               ),
               Spacer(),
-              IconButton(
-                onPressed: () {},
-                icon: Icon(Icons.delete, color: Colors.red),
+              Visibility(
+                visible: _changeStatusInProgress == false,
+                replacement: Center(child: CircularProgressIndicator()),
+                child: IconButton(
+                  onPressed: () {},
+                  icon: Icon(Icons.delete, color: Colors.red),
+                ),
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showChangeStatusDialog();
+                },
                 icon: Icon(Icons.edit, color: Colors.green),
               ),
             ],
@@ -60,4 +101,54 @@ class taskCard extends StatelessWidget {
       ),
     );
   }
+
+
+  void _showChangeStatusDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Change Task Status'),
+        content: Text('Are you sure you want to change the status of this task?'),
+        actions: [
+
+          ListTile(
+            title: Text('New'),
+            trailing: widget.taskModel.status == 'New' ? Icon(Icons.check, color: Colors.green) : null,
+            onTap: () {
+              _changeStatus('New');
+
+            },
+          ),
+          ListTile(
+            title: Text('Progress'),
+            trailing: widget.taskModel.status == 'Progress' ? Icon(Icons.check, color: Colors.green) : null,
+            onTap: () {
+              _changeStatus('Progress');
+
+            },
+          ),
+          ListTile(
+            title: Text('Cancelled'),
+            trailing: widget.taskModel.status == 'Cancelled' ? Icon(Icons.check, color: Colors.green) : null,
+            onTap: () {
+              _changeStatus('Cancelled');
+
+            },
+          ),
+          ListTile(
+            title: Text('Completed'),
+            trailing: widget.taskModel.status == 'Completed' ? Icon(Icons.check, color: Colors.green) : null,
+            onTap: () {
+              _changeStatus('Completed');
+
+            },
+          )
+
+        ],
+      ),
+    );
+  }
+
+
+
 }

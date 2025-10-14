@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:logger/logger.dart';
+import 'package:task_manager/app.dart';
+import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 
 import '../../ui/screens/Controller/auth_controller.dart';
 
@@ -239,7 +242,15 @@ class ApiCaller {
           responseData: decodedData,
           statusCode: statusCode,
         );
-      } else {
+      } else if(statusCode == 401){
+        await _moveToLoginScreen();
+        return ApiResponse(
+          isSuccess: false,
+          responseData: null,
+          statusCode: statusCode,
+          errorMessage: 'Unauthorized. Please log in again.',
+        );
+      }else {
         _logResponse(
           url: url,
           body: decodedData,
@@ -293,7 +304,15 @@ class ApiCaller {
           responseData: decodedData,
           statusCode: statusCode,
         );
-      } else {
+      }else if(statusCode == 401){
+        await _moveToLoginScreen();
+        return ApiResponse(
+          isSuccess: false,
+          responseData: null,
+          statusCode: statusCode,
+          errorMessage: 'Unauthorized. Please log in again.',
+        );
+      }else {
         _logResponse(
           url: url,
           body: decodedData,
@@ -348,7 +367,15 @@ class ApiCaller {
           responseData: decodedData,
           statusCode: statusCode,
         );
-      } else {
+      }else if(statusCode == 401){
+        await _moveToLoginScreen();
+        return ApiResponse(
+          isSuccess: false,
+          responseData: null,
+          statusCode: statusCode,
+          errorMessage: 'Unauthorized. Please log in again.',
+        );
+      }else {
         _logResponse(
           url: url,
           body: decodedData,
@@ -402,7 +429,15 @@ class ApiCaller {
           responseData: decodedData,
           statusCode: statusCode,
         );
-      } else {
+      } else if(statusCode == 401){
+        await _moveToLoginScreen();
+        return ApiResponse(
+          isSuccess: false,
+          responseData: null,
+          statusCode: statusCode,
+          errorMessage: 'Unauthorized. Please log in again.',
+        );
+      }else {
         _logResponse(
           url: url,
           body: decodedData,
@@ -467,6 +502,12 @@ class ApiCaller {
     } catch (_) {
       return data; // return raw string if not JSON
     }
+  }
+
+  static Future<void> _moveToLoginScreen() async {
+    AuthController.clearUserData();
+    Navigator.pushNamedAndRemoveUntil(TaskMangerApp.navigatorKey.currentContext!, SignInScreen.routeName, (predicate)=>false);
+
   }
 }
 

@@ -11,10 +11,12 @@ import 'package:task_manager/ui/screens/splash_screen.dart';
 
 class TaskMangerApp extends StatelessWidget {
   const TaskMangerApp({super.key});
+ static  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       initialRoute: '/',
       routes: {
         SplashScreen.routeName: (_) => SplashScreen(),
@@ -57,4 +59,4 @@ class TaskMangerApp extends StatelessWidget {
   }
 }
 
-class CreateNewPasswordScreen {}
+
