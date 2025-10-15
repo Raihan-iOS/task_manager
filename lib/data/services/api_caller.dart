@@ -209,21 +209,29 @@ import '../../ui/screens/Controller/auth_controller.dart';
 // }
 
 //!@========= Old Version ==========
+import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
+import 'package:logger/logger.dart';
+import 'package:task_manager/app.dart';
+import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
+import '../../ui/screens/Controller/auth_controller.dart';
+
 class ApiCaller {
   static Logger logger = Logger();
 
   static int timeoutDuration = 30;
 
-  // Make headers dynamic - rebuild on every request
+  // ✅ FIXED: Make headers dynamic - rebuild on every request
   static Map<String, String> get defaultHeaders {
     final headers = {
       "Content-Type": "application/json",
     };
 
-    // Add token if available (check your API documentation for correct format)
-    if (AuthController.accessToken != null) {
+    // Add token if available
+    if (AuthController.accessToken != null && AuthController.accessToken!.isNotEmpty) {
       headers["token"] = AuthController.accessToken!;
-      // OR if your API uses Bearer format:
+      // OR if your API uses Bearer format, use this instead:
       // headers["Authorization"] = "Bearer ${AuthController.accessToken}";
     }
 
@@ -237,7 +245,7 @@ class ApiCaller {
       _logRequest(url: url);
       Response response = await get(
         uri,
-        headers: defaultHeaders,  // Now gets fresh headers each time
+        headers: defaultHeaders,
       ).timeout(Duration(seconds: timeoutDuration));
 
       return _handleResponse(url, response);
@@ -302,7 +310,7 @@ class ApiCaller {
     }
   }
 
-  // Centralized response handler
+  //! Centralized response handler
   static ApiResponse _handleResponse(String url, Response response) {
     final int statusCode = response.statusCode;
     final decodedData = _safeDecode(response.body);
@@ -315,9 +323,7 @@ class ApiCaller {
         statusCode: statusCode,
       );
     } else if (statusCode == 401) {
-      logger.w('⚠️ 401 Unauthorized at $url');
-      // IMPORTANT: Don't auto-logout here!
-      // Let the UI handle it or add better error handling
+      logger.w('⚠️ 401 Unauthorized at $url - Logging out user');
       _logResponse(
         url: url,
         body: decodedData,
@@ -325,18 +331,15 @@ class ApiCaller {
         errorMessage: 'Unauthorized',
       );
 
-      // Option 1: Return error and let UI handle logout
-      // return ApiResponse(
-      //   isSuccess: false,
-      //   responseData: decodedData,
-      //   statusCode: statusCode,
-      //   errorMessage: 'Session expired. Please log in again.',
-      // );
+      // Automatically logout and redirect to login
+      _moveToLoginScreen();
 
-      // Option 2: Only logout if we're sure it's a real auth issue
-      if (AuthController.accessToken != null) {
-        _moveToLoginScreen();
-      }
+      return ApiResponse(
+        isSuccess: false,
+        responseData: decodedData,
+        statusCode: statusCode,
+        errorMessage: 'Session expired. Please log in again.',
+      );
     } else {
       _logResponse(
         url: url,
@@ -355,9 +358,10 @@ class ApiCaller {
     }
   }
 
-  // Centralized exception handler
+  //! Centralized exception handler
   static ApiResponse _handleException(String url, Exception e) {
     String errorMessage = 'An error occurred';
+
     if (e.toString().contains('SocketException')) {
       errorMessage = 'No Internet Connection';
     } else if (e.toString().contains('TimeoutException')) {
@@ -366,6 +370,7 @@ class ApiCaller {
       errorMessage = e.toString();
     }
 
+    logger.e('❌ Exception at $url: $errorMessage');
     _logResponse(
       url: url,
       body: null,
@@ -381,9 +386,10 @@ class ApiCaller {
     );
   }
 
+  //! Helpers
   static void _logRequest({required String url, Map<String, dynamic>? body}) {
     logger.i('➡️ Request URL: $url');
-    logger.i('➡️ Headers: $defaultHeaders');
+    logger.d('➡️ Headers: $defaultHeaders');
     if (body != null) {
       logger.i('➡️ Request Body: $body');
     }
@@ -403,7 +409,7 @@ class ApiCaller {
       logger.i('⬅️ Response Body: $body');
     }
     if (errorMessage != null) {
-      logger.e('⬅️ Error Message: $errorMessage');
+      logger.e('⬅️ Error: $errorMessage');
     }
   }
 
@@ -411,7 +417,7 @@ class ApiCaller {
     try {
       return jsonDecode(data);
     } catch (_) {
-      return data;
+      return data; // return raw string if not JSON
     }
   }
 
