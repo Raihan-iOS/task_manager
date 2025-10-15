@@ -7,15 +7,32 @@ import 'package:task_manager/ui/screens/auth/forget_password_setpassword.dart';
 
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
-class ForgetPasswordOtp extends StatelessWidget {
-  ForgetPasswordOtp({super.key});
-  static const String routeName = '/forget-password-otp';
+import '../../../data/services/api_caller.dart';
+import '../../../data/utils/constant.dart';
+import '../../widgets/SnackBarMessage.dart';
 
+class ForgetPasswordOtp extends StatefulWidget {
+  ForgetPasswordOtp({super.key,  this.emailAddress});
+  static const String routeName = '/forget-password-otp';
+  final String? emailAddress;
+
+  @override
+  State<ForgetPasswordOtp> createState() => _ForgetPasswordOtpState();
+}
+
+class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
   final TextEditingController _pinController = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _otpVerifyInProgress = false;
+
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map?;
+    final email = args?['email'] ?? widget.emailAddress ?? '';
+
+    print('Received email: $email'); // Debug line
     return Scaffold(
       body: ScreenBackground(
         child: Padding(
@@ -79,11 +96,16 @@ class ForgetPasswordOtp extends StatelessWidget {
                   appContext: context,
                 ),
                 const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: () {
-                    _gotoSetPasswordScreen(context);
-                  },
-                  child: const Text("Verify"),
+                Visibility(
+                  visible: _otpVerifyInProgress == false,
+                  replacement: const Center(child: CircularProgressIndicator()),
+                  child: FilledButton(
+                    onPressed: () {
+                      _otpVerify(email);
+
+                    },
+                    child: const Text("Verify"),
+                  ),
                 ),
                 const SizedBox(height: 36),
                 Center(
@@ -123,8 +145,34 @@ class ForgetPasswordOtp extends StatelessWidget {
       (route) => false,
     );
   }
+  @override
+  void dispose() {
+
+    _pinController.dispose();
+    super.dispose();
+
+  }
 
   void _gotoSetPasswordScreen(BuildContext context) {
-    Navigator.pushNamed(context, ForgetPasswordSetPassword.routeName);
+    Navigator.pushNamed(context, ForgetPasswordSetPassword.routeName,arguments: {'email': widget.emailAddress,'pin':_pinController.text.trim()});
+  }
+
+  void _otpVerify(String email) async {
+    _otpVerifyInProgress = true;
+    setState(() {});
+
+
+    ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.verifyOtp(email,_pinController.text.trim()));
+    if (apiResponse.isSuccess == true){
+      _otpVerifyInProgress = false;
+      setState(() {});
+      _pinController.clear();
+      _gotoSetPasswordScreen(context);
+    }else{
+      ShowSnackBarMessage(context, apiResponse.errorMessage ?? 'Something went wrong');
+      _otpVerifyInProgress = false;
+      _pinController.clear();
+      setState(() {});
+    }
   }
 }

@@ -172,9 +172,6 @@ class _SignInScreenState extends State<SignInScreen> {
       debugPrint('Token saved: ${AuthController.accessToken}');
 
 
-
-
-
       _clearForm();
       _signInInProgress = false;
       setState(() {});
@@ -192,8 +189,6 @@ class _SignInScreenState extends State<SignInScreen> {
           response.errorMessage ?? 'An error occurred',
         ),
       );
-
-
     }
   }
 

@@ -5,17 +5,33 @@ import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
-class ForgetPasswordSetPassword extends StatelessWidget {
+import '../../../data/services/api_caller.dart';
+import '../../../data/utils/constant.dart';
+import '../../widgets/SnackBarMessage.dart';
+
+class ForgetPasswordSetPassword extends StatefulWidget {
   ForgetPasswordSetPassword({super.key});
   static const String routeName = '/forget-password-setpassword';
 
+  @override
+  State<ForgetPasswordSetPassword> createState() => _ForgetPasswordSetPasswordState();
+}
+
+class _ForgetPasswordSetPasswordState extends State<ForgetPasswordSetPassword> {
   final TextEditingController _paswordController = TextEditingController();
+
   final TextEditingController _confirmPaswordController =
       TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool _setpasswordInProgress = false;
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as Map?;
+    final email = args?['email'] ?? '';
+    final pin = args?['pin'] ?? '';
     return Scaffold(
       body: ScreenBackground(
         child: Padding(
@@ -41,20 +57,42 @@ class ForgetPasswordSetPassword extends StatelessWidget {
                 TextFormField(
                   decoration: const InputDecoration(hintText: "Password"),
                   controller: _paswordController,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Enter password';
+                    }
+                    if (value!.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 8),
                 TextFormField(
                   decoration: const InputDecoration(
                     hintText: "Confirm Password",
                   ),
-                  controller: _paswordController,
+                  controller: _confirmPaswordController,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return 'Enter confirm password';
+                    }
+                    if (value != _paswordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 24),
-                FilledButton(
-                  onPressed: () {
-                    _gotoSignInScreen(context);
-                  },
-                  child: Icon(Icons.arrow_circle_right),
+                Visibility(
+                  visible: _setpasswordInProgress == false,
+                  child: FilledButton(
+
+                    onPressed: () {
+                      _setPassword(email, pin);
+                    },
+                    child: Icon(Icons.arrow_circle_right),
+                  ),
                 ),
                 const SizedBox(height: 36),
                 Center(
@@ -85,6 +123,34 @@ class ForgetPasswordSetPassword extends StatelessWidget {
         ),
       ),
     );
+  }
+  @override
+  void dispose() {
+    _confirmPaswordController.dispose();
+    _paswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _setPassword(String email,String pin) async {
+    _setpasswordInProgress = true;
+
+    Map<String,dynamic> requestBody = {
+      "email":email,
+      "OTP": pin,
+      "password":_paswordController.text.trim()
+    };
+    ApiResponse apiResponse = await ApiCaller.postRequest(url: Urls.setPassword,body:requestBody);
+    if (apiResponse.isSuccess == true){
+      ShowSnackBarMessage(context, 'Password reset successfully');
+      _setpasswordInProgress = false;
+      setState(() {});
+      _gotoSignInScreen(context);
+
+    }else{
+      ShowSnackBarMessage(context, apiResponse.errorMessage ?? 'Something went wrong');
+      _setpasswordInProgress = false;
+      setState(() {});
+    }
   }
 
   void _gotoSignInScreen(BuildContext context) {

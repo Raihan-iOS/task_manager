@@ -10,4 +10,7 @@ class Urls {
   static const String progressTasks = "${baseUrl}/listTaskByStatus/Progress";
   static  String changeTaskStatus(String taskId,String status) => "${baseUrl}/updateTaskStatus/${taskId}/${status}";
   static  String  deleteTask(String taskId) => "${baseUrl}/deleteTask/${taskId}";
+  static  String  verifyEmail(String email) => "${baseUrl}/RecoverVerifyEmail/${email}";
+  static  String  verifyOtp(String email, String otp) => "${baseUrl}/RecoverVerifyOtp/${email}/${otp}";
+  static const String setPassword = "${baseUrl}/RecoverResetPassword";
 }
