@@ -159,6 +159,9 @@ class _SignInScreenState extends State<SignInScreen> {
     };
     ApiResponse response =
         await ApiCaller.postRequest(url: Urls.login, body: requestBody);
+    debugPrint('Response: ${response.responseData}');
+    debugPrint('Status: ${response.responseData['status']}');
+
     if (response.isSuccess == true && response.responseData['status'] == 'success') {
       UserModel userModel = UserModel.fromJson(response.responseData['data']);
       String accessToken  = response.responseData['token'];
@@ -166,6 +169,9 @@ class _SignInScreenState extends State<SignInScreen> {
 
       debugPrint('User from AuthController: ${AuthController.userModel}');
       debugPrint('Token from AuthController: ${AuthController.accessToken}');
+      debugPrint('Token saved: ${AuthController.accessToken}');
+
+
 
 
 

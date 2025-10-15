@@ -5,6 +5,8 @@ import 'package:task_manager/ui/screens/home/new_task_screen.dart';
 import 'package:task_manager/ui/screens/home/progress_task_screen.dart';
 import 'package:task_manager/ui/widgets/app_bar.dart';
 
+import '../Controller/auth_controller.dart';
+
 class MainNavHolderScreen extends StatefulWidget {
   const MainNavHolderScreen({super.key});
   static const String routeName = '/dashboard';
@@ -21,6 +23,14 @@ class _MainNavHolderScreenState extends State<MainNavHolderScreen> {
     CanceledTaskScreen(),
     CompletedTaskScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    debugPrint('MainNavHolderScreen initialized');
+    debugPrint('User token: ${AuthController.accessToken}');
+    debugPrint('User model: ${AuthController.userModel}');
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

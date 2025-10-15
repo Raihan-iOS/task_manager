@@ -9,6 +9,7 @@ import 'package:task_manager/ui/widgets/task_card.dart';
 import 'package:task_manager/ui/widgets/task_count_by_status_card.dart';
 
 import '../../../data/models/task_status_count_model.dart';
+import '../Controller/auth_controller.dart';
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({super.key});
@@ -23,6 +24,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     super.initState();
     _getAllTaskStatusCount();
     _getAllNewTasks();
+    debugPrint('NewTaskScreen initialized-----------------------');
   }
   bool _getNewTaskCountInProgress = false;
   bool _getNewTaskInProgress = false;
@@ -33,7 +35,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   Future<void> _getAllTaskStatusCount() async {
     _getNewTaskCountInProgress = true;
 setState(() {});
+    debugPrint('Token being used: ${AuthController.accessToken}');
 ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.allTaskStatusCount);
+    debugPrint(' tasks count API response status code: ${apiResponse.statusCode}');
 if (apiResponse.isSuccess == true) {
   List<TaskStatusCountModel> taskStatusList = [];
   for(Map<String,dynamic> taskStatus in apiResponse.responseData['data']){
@@ -54,7 +58,10 @@ if (apiResponse.isSuccess == true) {
     _getNewTaskInProgress = true;
     setState(() {});
 
+    debugPrint('Token being used: ${AuthController.accessToken}');
+
     ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.newTasks);
+    debugPrint('New tasks API response status code: ${apiResponse.statusCode}');
 
     if (apiResponse.isSuccess == true) {
       // DEBUG: Print the actual response structure
