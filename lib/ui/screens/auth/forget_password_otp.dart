@@ -153,8 +153,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
 
   }
 
-  void _gotoSetPasswordScreen(BuildContext context) {
-    Navigator.pushNamed(context, ForgetPasswordSetPassword.routeName,arguments: {'email': widget.emailAddress,'pin':_pinController.text.trim()});
+  void _gotoSetPasswordScreen(BuildContext context, String email,String pin) {
+    Navigator.pushNamed(context, ForgetPasswordSetPassword.routeName,arguments: {'email': email,'pin':pin});
   }
 
   void _otpVerify(String email) async {
@@ -166,8 +166,8 @@ class _ForgetPasswordOtpState extends State<ForgetPasswordOtp> {
     if (apiResponse.isSuccess == true){
       _otpVerifyInProgress = false;
       setState(() {});
+      _gotoSetPasswordScreen(context, email, _pinController.text.trim());
       _pinController.clear();
-      _gotoSetPasswordScreen(context);
     }else{
       ShowSnackBarMessage(context, apiResponse.errorMessage ?? 'Something went wrong');
       _otpVerifyInProgress = false;

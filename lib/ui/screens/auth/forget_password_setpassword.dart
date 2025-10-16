@@ -10,8 +10,11 @@ import '../../../data/utils/constant.dart';
 import '../../widgets/SnackBarMessage.dart';
 
 class ForgetPasswordSetPassword extends StatefulWidget {
-  ForgetPasswordSetPassword({super.key});
+  ForgetPasswordSetPassword({super.key, this.emailAddress, this.pin});
   static const String routeName = '/forget-password-setpassword';
+  final String? emailAddress;
+  final String? pin;
+
 
   @override
   State<ForgetPasswordSetPassword> createState() => _ForgetPasswordSetPasswordState();
@@ -29,95 +32,99 @@ class _ForgetPasswordSetPasswordState extends State<ForgetPasswordSetPassword> {
 
   @override
   Widget build(BuildContext context) {
+
+
     final args = ModalRoute.of(context)!.settings.arguments as Map?;
-    final email = args?['email'] ?? '';
-    final pin = args?['pin'] ?? '';
+    final email = args?['email'] ??  widget.emailAddress ?? '';
+    final pin = args?['pin'] ??  widget.pin ?? '';
     return Scaffold(
       body: ScreenBackground(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 82),
-                Text(
-                  "Set Password",
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Password must be at least 8 characters and include 1 letter, 1 number & 1 special character",
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  decoration: const InputDecoration(hintText: "Password"),
-                  controller: _paswordController,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Enter password';
-                    }
-                    if (value!.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  decoration: const InputDecoration(
-                    hintText: "Confirm Password",
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 82),
+                  Text(
+                    "Set Password",
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  controller: _confirmPaswordController,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return 'Enter confirm password';
-                    }
-                    if (value != _paswordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 24),
-                Visibility(
-                  visible: _setpasswordInProgress == false,
-                  child: FilledButton(
-
-                    onPressed: () {
-                      _setPassword(email, pin);
+                  const SizedBox(height: 4),
+                  Text(
+                    "Password must be at least 8 characters and include 1 letter, 1 number & 1 special character",
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyLarge?.copyWith(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 24),
+                  TextFormField(
+                    decoration: const InputDecoration(hintText: "Password"),
+                    controller: _paswordController,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter password';
+                      }
+                      if (value!.length < 8) {
+                        return 'Password must be at least 8 characters';
+                      }
+                      return null;
                     },
-                    child: Icon(Icons.arrow_circle_right),
                   ),
-                ),
-                const SizedBox(height: 36),
-                Center(
-                  child: RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      text: "Already have an account? ",
-                      children: [
-                        TextSpan(
-                          text: "Sign In",
-                          style: const TextStyle(color: Colors.green),
-                          recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = () {
-                                  _gotoSignInScreen(context);
-                                },
-                        ),
-                      ],
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    decoration: const InputDecoration(
+                      hintText: "Confirm Password",
+                    ),
+                    controller: _confirmPaswordController,
+                    validator: (value) {
+                      if (value?.isEmpty ?? true) {
+                        return 'Enter confirm password';
+                      }
+                      if (value != _paswordController.text) {
+                        return 'Passwords do not match';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  Visibility(
+                    visible: _setpasswordInProgress == false,
+                    child: FilledButton(
+
+                      onPressed: () {
+                        _setPassword(email, pin);
+                      },
+                      child: Icon(Icons.arrow_circle_right),
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 36),
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        text: "Already have an account? ",
+                        children: [
+                          TextSpan(
+                            text: "Sign In",
+                            style: const TextStyle(color: Colors.green),
+                            recognizer:
+                                TapGestureRecognizer()
+                                  ..onTap = () {
+                                    _gotoSignInScreen(context);
+                                  },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -133,6 +140,8 @@ class _ForgetPasswordSetPasswordState extends State<ForgetPasswordSetPassword> {
 
   Future<void> _setPassword(String email,String pin) async {
     _setpasswordInProgress = true;
+    debugPrint('Email: $email, PIN: $pin');
+    debugPrint('password: $_paswordController.text.trim()');
 
     Map<String,dynamic> requestBody = {
       "email":email,
