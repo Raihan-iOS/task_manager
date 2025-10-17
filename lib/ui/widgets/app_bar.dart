@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 import 'package:task_manager/ui/screens/profile/profile_screen.dart';
@@ -29,7 +31,17 @@ class _TmAppbarState extends State<TmAppbar> {
         },
         child: Row(
           children: [
-            CircleAvatar(),
+            CircleAvatar(
+              radius: 20,
+              backgroundImage: AuthController.userModel?.photo != null &&
+                  AuthController.userModel!.photo.isNotEmpty
+                  ? MemoryImage(base64Decode(AuthController.userModel!.photo))
+                  : null,
+              child: AuthController.userModel?.photo == null ||
+                  AuthController.userModel!.photo.isEmpty
+                  ? Icon(Icons.person)
+                  : null,
+            ),
             SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,

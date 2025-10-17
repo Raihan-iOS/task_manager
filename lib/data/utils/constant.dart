@@ -13,4 +13,5 @@ class Urls {
   static  String  verifyEmail(String email) => "${baseUrl}/RecoverVerifyEmail/${email}";
   static  String  verifyOtp(String email, String otp) => "${baseUrl}/RecoverVerifyOtp/${email}/${otp}";
   static const String setPassword = "${baseUrl}/RecoverResetPassword";
+  static const String updateProfile = "${baseUrl}/ProfileUpdate";
 }

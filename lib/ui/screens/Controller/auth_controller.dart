@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager/data/models/user_model.dart';
 
@@ -42,5 +41,12 @@ class AuthController{
     userModel = null;
     await sharedPreferences.clear();
   }
+
+  static Future<void> updateProfile(UserModel user) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(_userModelKey, jsonEncode(user.toJson()));
+    userModel = user;
+  }
+
 
 }
