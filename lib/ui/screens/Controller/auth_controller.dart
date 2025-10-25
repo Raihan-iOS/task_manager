@@ -10,6 +10,7 @@ class AuthController{
   static String? accessToken;
   static UserModel? userModel;
 
+
   static Future<void> saveUserData(UserModel user,String token) async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     await sharedPreferences.setString(_accessTokenKey, token);
