@@ -1,228 +1,14 @@
-import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:logger/logger.dart';
-import 'package:task_manager/app.dart';
-import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
-
-import '../../ui/screens/Controller/auth_controller.dart';
-
-// class ApiCaller {
-//   static Logger logger = Logger();
-
-//   /// Default headers (you can extend with auth tokens, etc.)
-//   static Map<String, String> defaultHeaders = {
-//     "Content-Type": "application/json",
-//   };
-
-//   //! ========== GET Request ==========
-//   static Future<ApiResponse<T>> getRequest<T>({
-//     required String url,
-//     Map<String, String>? headers,
-//   }) async {
-//     try {
-//       Uri uri = Uri.parse(url);
-//       _logRequest(url: url);
-
-//       Response response = await get(
-//         uri,
-//         headers: {...defaultHeaders, ...?headers},
-//       ).timeout(const Duration(seconds: 15));
-
-//       return _handleResponse<T>(url, response);
-//     } on Exception catch (e) {
-//       return _handleException<T>(url, e);
-//     }
-//   }
-
-//   //! ========== POST Request ==========
-//   static Future<ApiResponse<T>> postRequest<T>({
-//     required String url,
-//     required Map<String, dynamic> body,
-//     Map<String, String>? headers,
-//   }) async {
-//     try {
-//       Uri uri = Uri.parse(url);
-//       _logRequest(url: url, body: body);
-
-//       Response response = await post(
-//         uri,
-//         headers: {...defaultHeaders, ...?headers},
-//         body: jsonEncode(body),
-//       ).timeout(const Duration(seconds: 15));
-
-//       return _handleResponse<T>(url, response);
-//     } on Exception catch (e) {
-//       return _handleException<T>(url, e);
-//     }
-//   }
-
-//   //! ========== PUT Request ==========
-//   static Future<ApiResponse<T>> putRequest<T>({
-//     required String url,
-//     required Map<String, dynamic> body,
-//     Map<String, String>? headers,
-//   }) async {
-//     try {
-//       Uri uri = Uri.parse(url);
-//       _logRequest(url: url, body: body);
-
-//       Response response = await put(
-//         uri,
-//         headers: {...defaultHeaders, ...?headers},
-//         body: jsonEncode(body),
-//       ).timeout(const Duration(seconds: 15));
-
-//       return _handleResponse<T>(url, response);
-//     } on Exception catch (e) {
-//       return _handleException<T>(url, e);
-//     }
-//   }
-
-//   //! ========== DELETE Request ==========
-//   static Future<ApiResponse<T>> deleteRequest<T>({
-//     required String url,
-//     Map<String, String>? headers,
-//   }) async {
-//     try {
-//       Uri uri = Uri.parse(url);
-//       _logRequest(url: url);
-
-//       Response response = await delete(
-//         uri,
-//         headers: {...defaultHeaders, ...?headers},
-//       ).timeout(const Duration(seconds: 15));
-
-//       return _handleResponse<T>(url, response);
-//     } on Exception catch (e) {
-//       return _handleException<T>(url, e);
-//     }
-//   }
-
-//   //! ========== Helpers ==========
-
-//   static ApiResponse<T> _handleResponse<T>(String url, Response response) {
-//     final int statusCode = response.statusCode;
-//     final dynamic decodedData = _safeDecode(response.body);
-
-//     if (statusCode >= 200 && statusCode < 300) {
-//       logger.i('✅ Success [$statusCode] $url');
-//       _logResponse(url: url, body: decodedData, statusCode: statusCode);
-//       return ApiResponse<T>(
-//         isSuccess: true,
-//         response: decodedData as T?,
-//         statusCode: statusCode,
-//       );
-//     } else {
-//       logger.w('⚠️ Failed [$statusCode] $url');
-//       _logResponse(
-//         url: url,
-//         body: decodedData,
-//         statusCode: statusCode,
-//         errorMessage: decodedData?['message'],
-//       );
-//       return ApiResponse<T>(
-//         isSuccess: false,
-//         response: decodedData as T?,
-//         statusCode: statusCode,
-//         errorMessage:
-//             decodedData is Map<String, dynamic> ? decodedData['message'] : null,
-//       );
-//     }
-//   }
-
-//   static ApiResponse<T> _handleException<T>(String url, Exception e) {
-//     String errorMessage = 'An error occurred';
-//     if (e is SocketException) {
-//       errorMessage = 'No Internet Connection';
-//     } else if (e is TimeoutException) {
-//       errorMessage = 'Request Timed Out';
-//     } else if (e is FormatException) {
-//       errorMessage = 'Invalid Response Format';
-//     } else {
-//       errorMessage = e.toString();
-//     }
-
-//     logger.e('❌ Exception $url => $errorMessage');
-//     _logResponse(
-//       url: url,
-//       body: null,
-//       statusCode: 0,
-//       errorMessage: errorMessage,
-//     );
-
-//     return ApiResponse<T>(
-//       isSuccess: false,
-//       response: null,
-//       statusCode: 0,
-//       errorMessage: errorMessage,
-//     );
-//   }
-
-//   static void _logRequest({required String url, Map<String, dynamic>? body}) {
-//     logger.d('➡️ Request URL: $url');
-//     if (body != null) {
-//       logger.d('➡️ Request Body: $body');
-//     }
-//   }
-
-//   static void _logResponse({
-//     required String url,
-//     required dynamic body,
-//     required int? statusCode,
-//     String? errorMessage,
-//   }) {
-//     logger.d('⬅️ Response URL: $url');
-//     if (body != null) {
-//       logger.d('⬅️ Response Body: $body');
-//     }
-//     if (statusCode != null) {
-//       logger.d('⬅️ Status Code: $statusCode');
-//     }
-//     if (errorMessage != null) {
-//       logger.e('⬅️ Error Message: $errorMessage');
-//     }
-//   }
-
-//   static dynamic _safeDecode(String data) {
-//     try {
-//       return jsonDecode(data);
-//     } catch (_) {
-//       return data; // return raw string if not JSON
-//     }
-//   }
-// }
-
-// class ApiResponse<T> {
-//   final bool isSuccess;
-//   final int statusCode;
-//   final T? response;
-//   final String? errorMessage;
-
-//   ApiResponse({
-//     required this.isSuccess,
-//     required this.statusCode,
-//     this.response,
-//     this.errorMessage,
-//   });
-// }
-
-//!@========= Old Version ==========
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart';
-import 'package:logger/logger.dart';
 import 'package:task_manager/app.dart';
 import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 import '../../ui/screens/Controller/auth_controller.dart';
 
 class ApiCaller {
-  static Logger logger = Logger();
-
   static int timeoutDuration = 30;
 
-  // ✅ FIXED: Make headers dynamic - rebuild on every request
+  // ✅ Dynamic headers getter
   static Map<String, String> get defaultHeaders {
     final headers = {
       "Content-Type": "application/json",
@@ -231,8 +17,9 @@ class ApiCaller {
     // Add token if available
     if (AuthController.accessToken != null && AuthController.accessToken!.isNotEmpty) {
       headers["token"] = AuthController.accessToken!;
-      // OR if your API uses Bearer format, use this instead:
-      // headers["Authorization"] = "Bearer ${AuthController.accessToken}";
+      debugPrint('✅ Token added to headers');
+    } else {
+      debugPrint('⚠️ No token available');
     }
 
     return headers;
@@ -241,15 +28,16 @@ class ApiCaller {
   //! GET Request
   static Future<ApiResponse> getRequest({required String url}) async {
     try {
-      Uri uri = Uri.parse(url);
-      _logRequest(url: url);
+      debugPrint('📤 GET: $url');
+      debugPrint('📋 Headers: $defaultHeaders');
+
       Response response = await get(
-        uri,
+        Uri.parse(url),
         headers: defaultHeaders,
       ).timeout(Duration(seconds: timeoutDuration));
 
       return _handleResponse(url, response);
-    } on Exception catch (e) {
+    } catch (e) {
       return _handleException(url, e);
     }
   }
@@ -260,16 +48,18 @@ class ApiCaller {
     required Map<String, dynamic> body,
   }) async {
     try {
-      Uri uri = Uri.parse(url);
-      _logRequest(url: url, body: body);
+      debugPrint('📤 POST: $url');
+      debugPrint('📋 Headers: $defaultHeaders');
+      debugPrint('📦 Body: $body');
+
       Response response = await post(
-        uri,
+        Uri.parse(url),
         headers: defaultHeaders,
         body: jsonEncode(body),
       ).timeout(Duration(seconds: timeoutDuration));
 
       return _handleResponse(url, response);
-    } on Exception catch (e) {
+    } catch (e) {
       return _handleException(url, e);
     }
   }
@@ -280,16 +70,18 @@ class ApiCaller {
     required Map<String, dynamic> body,
   }) async {
     try {
-      Uri uri = Uri.parse(url);
-      _logRequest(url: url, body: body);
+      debugPrint('📤 PUT: $url');
+      debugPrint('📋 Headers: $defaultHeaders');
+      debugPrint('📦 Body: $body');
+
       Response response = await put(
-        uri,
+        Uri.parse(url),
         headers: defaultHeaders,
         body: jsonEncode(body),
       ).timeout(Duration(seconds: timeoutDuration));
 
       return _handleResponse(url, response);
-    } on Exception catch (e) {
+    } catch (e) {
       return _handleException(url, e);
     }
   }
@@ -297,43 +89,37 @@ class ApiCaller {
   //! DELETE Request
   static Future<ApiResponse> deleteRequest({required String url}) async {
     try {
-      Uri uri = Uri.parse(url);
-      _logRequest(url: url);
+      debugPrint('📤 DELETE: $url');
+      debugPrint('📋 Headers: $defaultHeaders');
+
       Response response = await delete(
-        uri,
+        Uri.parse(url),
         headers: defaultHeaders,
       ).timeout(Duration(seconds: timeoutDuration));
 
       return _handleResponse(url, response);
-    } on Exception catch (e) {
+    } catch (e) {
       return _handleException(url, e);
     }
   }
 
-  //! Centralized response handler
+  //! Response handler
   static ApiResponse _handleResponse(String url, Response response) {
-    final int statusCode = response.statusCode;
+    final statusCode = response.statusCode;
     final decodedData = _safeDecode(response.body);
 
+    debugPrint('📥 Status: $statusCode');
+    debugPrint('📥 Response: $decodedData');
+
     if (statusCode == 200 || statusCode == 201 || statusCode == 204) {
-      _logResponse(url: url, body: decodedData, statusCode: statusCode);
       return ApiResponse(
         isSuccess: true,
         responseData: decodedData,
         statusCode: statusCode,
       );
     } else if (statusCode == 401) {
-      logger.w('⚠️ 401 Unauthorized at $url - Logging out user');
-      _logResponse(
-        url: url,
-        body: decodedData,
-        statusCode: statusCode,
-        errorMessage: 'Unauthorized',
-      );
-
-      // Automatically logout and redirect to login
+      debugPrint('⚠️ 401 Unauthorized - Logging out');
       _moveToLoginScreen();
-
       return ApiResponse(
         isSuccess: false,
         responseData: decodedData,
@@ -341,12 +127,6 @@ class ApiCaller {
         errorMessage: 'Session expired. Please log in again.',
       );
     } else {
-      _logResponse(
-        url: url,
-        body: decodedData,
-        statusCode: statusCode,
-        errorMessage: decodedData is Map ? decodedData['data'] : null,
-      );
       return ApiResponse(
         isSuccess: false,
         responseData: decodedData,
@@ -358,8 +138,8 @@ class ApiCaller {
     }
   }
 
-  //! Centralized exception handler
-  static ApiResponse _handleException(String url, Exception e) {
+  //! Exception handler
+  static ApiResponse _handleException(String url, Object e) {
     String errorMessage = 'An error occurred';
 
     if (e.toString().contains('SocketException')) {
@@ -370,13 +150,7 @@ class ApiCaller {
       errorMessage = e.toString();
     }
 
-    logger.e('❌ Exception at $url: $errorMessage');
-    _logResponse(
-      url: url,
-      body: null,
-      statusCode: 0,
-      errorMessage: errorMessage,
-    );
+    debugPrint('❌ Exception: $errorMessage');
 
     return ApiResponse(
       isSuccess: false,
@@ -386,38 +160,11 @@ class ApiCaller {
     );
   }
 
-  //! Helpers
-  static void _logRequest({required String url, Map<String, dynamic>? body}) {
-    logger.i('➡️ Request URL: $url');
-    logger.d('➡️ Headers: $defaultHeaders');
-    if (body != null) {
-      logger.i('➡️ Request Body: $body');
-    }
-  }
-
-  static void _logResponse({
-    required String url,
-    required dynamic body,
-    required int? statusCode,
-    String? errorMessage,
-  }) {
-    logger.i('⬅️ Response URL: $url');
-    if (statusCode != null) {
-      logger.i('⬅️ Status Code: $statusCode');
-    }
-    if (body != null) {
-      logger.i('⬅️ Response Body: $body');
-    }
-    if (errorMessage != null) {
-      logger.e('⬅️ Error: $errorMessage');
-    }
-  }
-
   static dynamic _safeDecode(String data) {
     try {
       return jsonDecode(data);
     } catch (_) {
-      return data; // return raw string if not JSON
+      return data;
     }
   }
 

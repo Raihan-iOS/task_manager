@@ -1,6 +1,7 @@
 import 'dart:convert';
 
- import 'package:shared_preferences/shared_preferences.dart';
+ import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:task_manager/data/models/user_model.dart';
 
 class AuthController{
@@ -17,6 +18,9 @@ class AuthController{
     await sharedPreferences.setString(_userModelKey, jsonEncode(user.toJson()));
     accessToken = token;
     userModel = user;
+    // 🔥 Add debug logs
+    debugPrint('✅ Token saved to memory: $accessToken');
+    debugPrint('✅ User saved: ${user.email}');
   }
 
   static Future<void> getUserData() async {
