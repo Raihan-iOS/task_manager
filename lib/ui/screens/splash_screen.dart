@@ -18,7 +18,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    _preloadSvg();
     _moveToNextScreen();
+  }
+
+  Future<void> _preloadSvg() async {
+    final loader = SvgAssetLoader(AssetsPaths.logo2);
+    await svg.cache
+        .putIfAbsent(loader.cacheKey(null), () => loader.loadBytes(null));
   }
 
   Future<void> _moveToNextScreen() async {
@@ -40,7 +47,12 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: ScreenBackground(
           child: Center(
-            child: SvgPicture.asset(AssetsPaths.logo, width: 60, height: 60),
+            child: Image.asset(
+              AssetsPaths.logo,
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain, // Keeps aspect ratio
+            ),
           ),
         ),
       ),
