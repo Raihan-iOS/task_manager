@@ -51,7 +51,7 @@ class _SplashScreenState extends State<SplashScreen> {
               AssetsPaths.logo,
               width: 200,
               height: 200,
-              fit: BoxFit.contain, // Keeps aspect ratio
+              fit: BoxFit.contain,
             ),
           ),
         ),
