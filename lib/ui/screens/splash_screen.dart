@@ -34,6 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn == true){
      await AuthController.getUserData();
     Navigator.pushReplacementNamed(context, MainNavHolderScreen.routeName);
+
     }else{
     Navigator.pushReplacementNamed(context, SignInScreen.routeName);
     }
