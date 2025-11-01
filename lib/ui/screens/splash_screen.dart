@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:task_manager/ui/screens/Controller/auth_controller.dart';
 import 'package:task_manager/ui/screens/auth/Sign_in_screen.dart';
 import 'package:task_manager/ui/screens/home/main_nav_holder_screen.dart';
@@ -40,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: ScreenBackground(
           child: Center(
-            child: SvgPicture.asset(AssetsPaths.logo, width: 60, height: 60),
+            child: Image.asset(AssetsPaths.logo2, height: 200,width: 200,fit: BoxFit.contain,),
           ),
         ),
       ),

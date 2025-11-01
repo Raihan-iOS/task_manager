@@ -1,28 +1,44 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/services/api_caller.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/ui/widgets/SnackBarMessage.dart';
 import 'package:task_manager/ui/widgets/app_bar.dart';
 import 'package:task_manager/ui/widgets/screen_background.dart';
 
-import '../../../data/utils/constant.dart';
+import '../Controller/new_task_add_provider.dart';
+import '../Controller/new_task_list_provider.dart';
 
-class AddNewTaskScreen extends StatefulWidget {
+class AddNewTaskScreen extends StatelessWidget {
   const AddNewTaskScreen({super.key});
   static const String routeName = '/add-new-task';
 
   @override
-  State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
-}
-
-class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _titleTEController = TextEditingController();
-  final TextEditingController _descriptionTEController =
-      TextEditingController();
-  bool _addNewTaskInProgress = false;
-
-  @override
   Widget build(BuildContext context) {
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    final TextEditingController titleTEController = TextEditingController();
+    final TextEditingController descriptionTEController = TextEditingController();
+
+    Future<void> addNewTask() async {
+      bool isSuccess = await context.read<NewTaskAddProvider>().addNewTaskApi(
+        titleTEController.text.trim(),
+        descriptionTEController.text.trim(),
+      );
+      if (isSuccess == true) {
+        context.read<NewTaskListProvider>().newTaskListFetch();
+        titleTEController.clear();
+        descriptionTEController.clear();
+        ShowSnackBarMessage(context, 'Task added successfully');
+      } else {
+        ShowSnackBarMessage(context,
+            context.read<NewTaskAddProvider>().getErrorMessage ?? 'Something went wrong');
+      }
+    }
+
+    void onTapAddNewTask() {
+      if (formKey.currentState?.validate() ?? false) {
+        addNewTask();
+      }
+    }
+
     return Scaffold(
       appBar: TmAppbar(),
       body: ScreenBackground(
@@ -30,7 +46,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Form(
-              key: _formKey,
+              key: formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -39,10 +55,10 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                     "Add New Task",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   TextFormField(
-                    controller: _titleTEController,
-                    decoration: InputDecoration(hintText: "Title"),
+                    controller: titleTEController,
+                    decoration: const InputDecoration(hintText: "Title"),
                     textInputAction: TextInputAction.next,
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
@@ -51,11 +67,11 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   TextFormField(
-                    controller: _descriptionTEController,
+                    controller: descriptionTEController,
                     maxLines: 7,
-                    decoration: InputDecoration(hintText: "Description"),
+                    decoration: const InputDecoration(hintText: "Description"),
                     validator: (String? value) {
                       if (value?.trim().isEmpty ?? true) {
                         return 'Please enter description';
@@ -63,13 +79,16 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16),
-                  Visibility(
-                    visible: _addNewTaskInProgress == false,
-                    replacement: CircularProgressIndicator(),
-                    child: FilledButton(onPressed: () {
-                      _addNewTask();
-                    }, child: Text('Add')),
+                  const SizedBox(height: 16),
+                  Consumer<NewTaskAddProvider>(
+                    builder: (context, provider, _) => Visibility(
+                      visible: provider.addTaskInProgress == false,
+                      replacement: Center(child: const CircularProgressIndicator()),
+                      child: FilledButton(
+                        onPressed: onTapAddNewTask,
+                        child: const Text('Add'),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -78,44 +97,5 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         ),
       ),
     );
-  }
-  void _onTapAddNewTask() {
-    if (_formKey.currentState?.validate() ?? false) {
-      _addNewTask();
-    }
-  }
-
-  Future<void> _addNewTask() async {
-    _addNewTaskInProgress = true;
-    String title = _titleTEController.text.trim();
-    String description = _descriptionTEController.text.trim();
-    Map<String,dynamic> requestBody = {
-      "title":title,
-      "description": description,
-      "status":"New"
-    };
-    ApiResponse apiResponse = await ApiCaller.postRequest(url: Urls.createTask,body:requestBody);
-   if (apiResponse.isSuccess == true){
-     _clearFormData();
-     ShowSnackBarMessage(context, 'Task added successfully');
-     _addNewTaskInProgress = false;
-     setState(() {});
-
-   }else{
-     ShowSnackBarMessage(context, apiResponse?.errorMessage ?? 'Something went wrong');
-     _addNewTaskInProgress = false;
-     setState(() {});
-   }
-  }
-  void _clearFormData() {
-    _titleTEController.clear();
-    _descriptionTEController.clear();
-  }
-
-  @override
-  dispose() {
-    _titleTEController.dispose();
-    _descriptionTEController.dispose();
-    super.dispose();
   }
 }
