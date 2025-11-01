@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:task_manager/data/models/task_model.dart';
 import 'package:task_manager/data/services/api_caller.dart';
 import 'package:task_manager/data/utils/constant.dart';
+import 'package:task_manager/ui/screens/Controller/new_task_list_provider.dart';
+import 'package:task_manager/ui/screens/Controller/task_count_provider.dart';
 import 'package:task_manager/ui/screens/home/add_new_task_screen.dart';
 import 'package:task_manager/ui/widgets/SnackBarMessage.dart';
 import 'package:task_manager/ui/widgets/centered_progress_indicator.dart';
@@ -20,75 +23,30 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
-  initState() {
+  @override
+  void initState() {
     super.initState();
-    _getAllTaskStatusCount();
-    _getAllNewTasks();
-    debugPrint('NewTaskScreen initialized-----------------------');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _getAllTaskStatusCount();
+      _getAllNewTasks();
+    });
   }
-  bool _getNewTaskCountInProgress = false;
-  bool _getNewTaskInProgress = false;
-  List<TaskStatusCountModel> _taskStatusCountList = [];
-  List<TaskModel> _newTaskList = [];
 
   //! Task Count By Status
   Future<void> _getAllTaskStatusCount() async {
-    _getNewTaskCountInProgress = true;
-setState(() {});
-    debugPrint('Token being used: ${AuthController.accessToken}');
-ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.allTaskStatusCount);
-    debugPrint(' tasks count API response status code: ${apiResponse.statusCode}');
-if (apiResponse.isSuccess == true) {
-  List<TaskStatusCountModel> taskStatusList = [];
-  for(Map<String,dynamic> taskStatus in apiResponse.responseData['data']){
-    taskStatusList.add(TaskStatusCountModel.fromJson(taskStatus));
+    final taskCountProvider = context.read<TaskCountProvider>();
+    bool isSuccess = await taskCountProvider.getTaskCount();
+    if (!isSuccess && mounted) {
+      ShowSnackBarMessage(context, taskCountProvider.getErrorMessage!);
+    }
   }
-  _taskStatusCountList = taskStatusList;
-  _getNewTaskCountInProgress = false;
-  setState(() {});
-}else{
-  ShowSnackBarMessage(context, apiResponse.errorMessage!);
-  _getNewTaskCountInProgress = false;
-  setState(() {});
-}
-  }
+
   //! Get task Data
-
   Future<void> _getAllNewTasks() async {
-    _getNewTaskInProgress = true;
-    setState(() {});
-
-    debugPrint('Token being used: ${AuthController.accessToken}');
-
-    ApiResponse apiResponse = await ApiCaller.getRequest(url: Urls.newTasks);
-    debugPrint('New tasks API response status code: ${apiResponse.statusCode}');
-
-    if (apiResponse.isSuccess == true) {
-      // DEBUG: Print the actual response structure
-      print('Response Data Type: ${apiResponse.responseData.runtimeType}');
-      print('Response Data: ${apiResponse.responseData}');
-      print('Data field: ${apiResponse.responseData['data']}');
-      print('Data field type: ${apiResponse.responseData['data'].runtimeType}');
-
-      List<TaskModel> list = [];
-
-      // FIX: Ensure data is a List
-      var data = apiResponse.responseData['data'];
-      if (data is List) {
-        for (var task in data) {
-          if (task is Map<String, dynamic>) {
-            list.add(TaskModel.fromJson(task));
-          }
-        }
-      }
-
-      _newTaskList = list;
-      _getNewTaskInProgress = false;
-      setState(() {});
-    } else {
-      ShowSnackBarMessage(context, apiResponse.errorMessage!);
-      _getNewTaskInProgress = false;
-      setState(() {});
+    final newTaskListProvider = context.read<NewTaskListProvider>();
+    bool isSuccess = await newTaskListProvider.newTaskListFetch();
+    if (!isSuccess && mounted) {
+      ShowSnackBarMessage(context, newTaskListProvider.getErrorMessage!);
     }
   }
 
@@ -112,34 +70,49 @@ if (apiResponse.isSuccess == true) {
               SizedBox(height: 16),
               SizedBox(
                 height: 90,
-                child: Visibility(
-                  visible: _getNewTaskCountInProgress == false,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-
-                    itemBuilder:
-                        (context, index) =>
-                            TaskCountByStatus(title: _taskStatusCountList[index].status, count:  _taskStatusCountList[index].count),
-                    separatorBuilder: (context, index) => const SizedBox(width: 4),
-                    itemCount: _taskStatusCountList.length,
-                  ),
+                child: Consumer<TaskCountProvider>(
+                  builder: (context, taskCountController, _) {
+                    return Visibility(
+                      visible: taskCountController.taskCountInProgress == false,
+                      replacement: Center(child: CircularProgressIndicator()),
+                      child: taskCountController.taskStatusCountList.isEmpty
+                          ? Center(child: Text('No status data'))
+                          : ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) => TaskCountByStatus(
+                          title: taskCountController.taskStatusCountList[index].status,
+                          count: taskCountController.taskStatusCountList[index].count,
+                        ),
+                        separatorBuilder: (context, index) => const SizedBox(width: 4),
+                        itemCount: taskCountController.taskStatusCountList.length,
+                      ),
+                    );
+                  },
                 ),
               ),
               SizedBox(height: 16),
               Expanded(
-                child: Visibility(
-                  visible: _getNewTaskInProgress == false,
-                  replacement: Center(child: CircularProgressIndicator()),
-                  child: ListView.separated(
-                    itemBuilder:
-                        (context, index) => taskCard(taskStatus: TaskStatus.New, taskModel: _newTaskList[index], refreashParents: (){
-                          _getAllNewTasks();
-                          _getAllTaskStatusCount();
-                        },),
-                    separatorBuilder: (context, index) => const SizedBox(height: 4),
-                    itemCount: _newTaskList.length,
-                  ),
+                child: Consumer<NewTaskListProvider>(
+                  builder: (context, controller, _) {
+                    return Visibility(
+                      visible: controller.newTaskListInProgress == false,
+                      replacement: Center(child: CircularProgressIndicator()),
+                      child: controller.newTaskList.isEmpty
+                          ? Center(child: Text('No tasks available'))
+                          : ListView.separated(
+                        itemBuilder: (context, index) => taskCard(
+                          taskStatus: TaskStatus.New,
+                          taskModel: controller.newTaskList[index],
+                          refreashParents: () {
+                            controller.newTaskListFetch();
+                            _getAllTaskStatusCount();
+                          },
+                        ),
+                        separatorBuilder: (context, index) => const SizedBox(height: 4),
+                        itemCount: controller.newTaskList.length,
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -147,14 +120,10 @@ if (apiResponse.isSuccess == true) {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => gotoAddNewtaskScreen(),
+        onPressed: () => Navigator.pushNamed(context, AddNewTaskScreen.routeName),
         child: Icon(Icons.add),
       ),
     );
-  }
-
-  void gotoAddNewtaskScreen() {
-    Navigator.pushNamed(context, AddNewTaskScreen.routeName);
   }
 }
 
